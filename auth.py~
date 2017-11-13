@@ -18,13 +18,11 @@ class Auth (threading.Thread) :
     
     def clientCall (self) :
         auth = 0
-        username = ''
+        username = 'kkalisjndjk'
         com=' '
         while True :
-            if com[0] == 'LOGIN':
-                if auth != 0 :
-                    self.conn.send(b"-ERR You Already Logged In")
-                elif len(com) != 2 :
+            if com[0] == 'LOGIN' and auth==0:
+                if len(com) != 2 :
                     self.conn.send(b"-ERR Wrong Argument")
                 else :
                     print("Try to login --> Username : " + com[1])
@@ -68,10 +66,8 @@ class Auth (threading.Thread) :
                 else :
                     self.conn.send(b"-ERR Wrong Argument")
             
-            elif com[0]== 'PUB' and auth!=0 :
-                if len(self.onlinelist) > 0 :
-                    self.conn.send(b"-ERR No Other User Online")
-                elif len(com)==2 and com[1].lstrip()!='' :
+            elif com[0]== 'PUB' and auth!=0:
+                if len(com)==2 and com[1].lstrip()!='' :
                     for target in self.onlinelist.values() :
                         #print(target)
                         if target!=self.conn :
@@ -81,16 +77,16 @@ class Auth (threading.Thread) :
                 else :
                     self.conn.send(b"-ERR Wrong Argument")
 
-            elif com[0]=='QUIT' :
+            elif com[0]=='quit' :
                 if len(com) == 1 :
-                    if auth!=0 and username != '':
-                        del self.onlinelist[username]
-                        print("Logging out : " + username)
+                    if auth==1:
+                        if username != 'kkalisjndjk' :
+                            del self.onlinelist[username]
+                            print("Logging out : " + username)
                         self.conn.send(b"Connection closed")
                         break
                     else :
                         self.conn.send(b"Connection closed")
-                        break
                 else :
                     self.conn.send(b"-ERR Wrong Argument")
 
@@ -100,7 +96,7 @@ class Auth (threading.Thread) :
             comm=self.conn.recv(2048).decode()
             com=comm.split(' ', 2)
             if com[0] != 'LOGIN' :
-                print("Command : " + com[0] + " From " + username + " (" + str(self.client) + ")")
+                print("Command : " + com[0] + " From " + username)
 
         self.conn.close
 
