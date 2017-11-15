@@ -12,7 +12,7 @@ class Receive(threading.Thread) :
         self.fuc ()
         #print(threading.activeCount())
         print ("Exiting recv function")
-        return "quit"
+        print ("Connection Closed")
 
     def fuc (self) :
         while True :
@@ -32,7 +32,6 @@ class Sending(threading.Thread) :
         self.fuc2 ()
         #print(threading.activeCount())
         print ("Exiting send function")
-        return "quit"
     
     def fuc2 (self) :
         while True :
@@ -41,10 +40,9 @@ class Sending(threading.Thread) :
             if data.lstrip() != '' :
                 self.sock.send(data.encode())	#encode the user message so it can be send with sock.send()
             if data == "QUIT":	#if server close connection,close socket on client too
-                print("Exit Code Detected, Connection Closed")
+                print("Exit Code Detected")
                 self.sock.close()
                 break
-
 
 
 

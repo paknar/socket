@@ -2,6 +2,8 @@ import socket
 import sys
 import threading
 from funcrecv import Receive, Sending
+#from crypt import AESCipher
+
 port = 12345
 host = 'localhost'
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,5 +19,5 @@ if sock is not None:
 	send=Sending(sock)
 	recv.start()
 	send.start()
-	
+	print(sock)
 sys.exit(1)

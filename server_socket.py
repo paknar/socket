@@ -1,9 +1,8 @@
 import socket
 import sys
 import threading
-#from fu import *
 from auth import Auth
-#from func import Func
+#from crypt import AESCipher
 
 print("Server Start")
 host = 'localhost'
@@ -22,8 +21,6 @@ while True :
 	try :
 	#count=threading.activeCount()-2
 		conn, client = sock.accept()
-		print(conn)
-		print(client)
 		thread = Auth(thread_ID, client, conn)
 		thread.start()
 		threads.append(thread)
