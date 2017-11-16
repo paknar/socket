@@ -2,9 +2,9 @@ import socket
 import sys
 import threading
 from funcrecv import Receive, Sending
-#from crypt import AESCipher
 
-port = 12345
+
+port = 14000
 host = 'localhost'
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

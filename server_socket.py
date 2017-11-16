@@ -6,7 +6,7 @@ from auth import Auth
 
 print("Server Start")
 host = 'localhost'
-port = 12345
+port = 14000
 
 
 sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -23,8 +23,8 @@ while True :
 		conn, client = sock.accept()
 		thread = Auth(thread_ID, client, conn)
 		thread.start()
-		threads.append(thread)
-		thread_num+=1
+		#threads.append(thread)
+		#thread_num+=1
 		thread_ID+=1
 	#print(threading.activeCount() , count)
 	except KeyboardInterrupt :

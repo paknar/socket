@@ -26,6 +26,7 @@ class Auth (threading.Thread) :
         while True :
 
             comm=self.conn.recv(2048).decode()
+            #comm=AESCipher.decrypt(msg)
             com=comm.split(' ')
             if com[0] == 'MULTI' or com[0] == 'PUB' :
                 com=comm.split(' ', 1)
@@ -66,28 +67,35 @@ class Auth (threading.Thread) :
 
             elif com[0]=='PRIV' and auth!=0: #private chat
                 if len(com) ==3 and com[2].lstrip()!='' : #cek argument
-                    try :
-                        target = self.onlinelist[com[1]] #cek user target online
-                    except KeyError :
-                        #print(com[2].lstrip())
-                        self.conn.send(b"-ERR User Doesn't Exist")
-                    else : 
-                        msg="Private :\nPesan dari " + username + " : " +  com[2]
-                        target.send(msg.encode())
-                        self.conn.send(b"+OK Sending Success")
+                    if len(com[2]) < 256 :
+                        try :
+                            target = self.onlinelist[com[1]] #cek user target online
+                        except KeyError :
+                            #print(com[2].lstrip())
+                            self.conn.send(b"-ERR User Doesn't Exist")
+                        else : 
+                            msg="Private :\nPesan dari " + username + " : " +  com[2]
+                            target.send(msg.encode())
+                            self.conn.send(b"+OK Sending Success")
+                    else :
+                        self.conn.send(b"-ERR Message Too Long")
                 else :
                     self.conn.send(b"-ERR Wrong Argument")
             
             elif com[0]== 'PUB' and auth!=0 : #fungsi broadcast
-                if len(self.onlinelist) > 0 : #cek user lain yang online
+                if len(self.onlinelist) < 2 : #cek user lain yang online
                     self.conn.send(b"-ERR No Other User Online")
                 elif len(com)==2 and com[1].lstrip()!='' : #cek command
-                    for target in self.onlinelist.values() :
-                        #print(target)
-                        if target!=self.conn :
-                            msg="Public :\nPesan dari " + username + " : " + com[1]
-                            target.send(msg.encode())
-                    self.conn.send(b"+OK Broadcast Success")
+                    if len(com[1]) < 256 :
+                        for target in self.onlinelist.values() :
+                            #print(target)
+                            if target!=self.conn :
+                                msg="Public :\nPesan dari " + username + " : " + com[1]
+                                
+                                target.send(msg.encode())
+                        self.conn.send(b"+OK Broadcast Success")
+                    else :
+                        self.conn.send(b"-ERR Message Too Long")
                 else :
                     self.conn.send(b"-ERR Wrong Argument")
 
@@ -139,11 +147,14 @@ class Auth (threading.Thread) :
                 if len(com) == 2 :
                     if multi != ' ' :
                         if len(self.multilist[multi]) > 1 :
-                            for target in self.multilist[multi] :
-                                if target!=self.conn :
-                                    msg="@" + username + ' ' + com[1]
-                                    target.send(msg.encode())
-                            self.conn.send(b"+OK Sending Multichat Success")
+                            if len(com[1]) < 256 :
+                                for target in self.multilist[multi] :
+                                    if target!=self.conn :
+                                        msg="@" + username + ' ' + com[1]
+                                        target.send(msg.encode())
+                                self.conn.send(b"+OK Sending Multichat Success")
+                            else :
+                                self.conn.send(b"Message Too Long")
                         else : 
                             self.conn.send(b"-ERR No Other User In " + multi.encode())
                     else :

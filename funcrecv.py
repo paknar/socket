@@ -1,6 +1,7 @@
 import socket
 import sys
 import threading
+from crypt import AESCipher
 
 class Receive(threading.Thread) :
     def __init__ (self,sock) :
@@ -16,7 +17,8 @@ class Receive(threading.Thread) :
 
     def fuc (self) :
         while True :
-            incoming = self.sock.recv(2048).decode()	#decode incoming message from server
+            msg = self.sock.recv(2048).decode()	#decode incoming message from server
+            incoming = AESCipher.decrypt(msg)
             if incoming == "Connection closed":	#if server close connection,close socket on client too
                 self.sock.close()
                 break
@@ -34,11 +36,13 @@ class Sending(threading.Thread) :
         print ("Exiting send function")
     
     def fuc2 (self) :
+        
         while True :
             data = input()
             #print('a', data.lstrip(), 'a', '\r', 'a')
             if data.lstrip() != '' :
-                self.sock.send(data.encode())	#encode the user message so it can be send with sock.send()
+                msg = AESCipher.encrypt(data.lstrip())
+                self.sock.send(msg.encode())	#encode the user message so it can be send with sock.send()
             if data == "QUIT":	#if server close connection,close socket on client too
                 print("Exit Code Detected")
                 self.sock.close()
