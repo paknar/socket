@@ -1,34 +1,33 @@
 import socket
 import sys
-#from fu import *
+import threading
+from auth import Auth
+#from crypt import AESCipher
 
+print("Server Start")
 host = 'localhost'
-port = ''
+port = 12345
 
-if len(sys.argv)==1:
-	print("no port specified.default is 12344")
-	port = 12344
-else:
-	port = int(sys.argv[1])
 
 sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 sock.bind((host,port)) #bind the socket
 sock.listen(1) #listen for incoming connection
 
-conn, client = sock.accept()
-print ("New Connection from",client)
+thread_num = 0
+thread_ID = 1
+threads = []
 
-while True:
-	data = conn.recv(1024)
-	if not data:		#if no data recieved,break the loop
+while True :
+	try :
+	#count=threading.activeCount()-2
+		conn, client = sock.accept()
+		thread = Auth(thread_ID, client, conn)
+		thread.start()
+		threads.append(thread)
+		thread_num+=1
+		thread_ID+=1
+	#print(threading.activeCount() , count)
+	except KeyboardInterrupt :
 		break
-	input = data.decode()
-	print("client input : ",input)
-	if input == "quit":	#if client sent "quit" stop the server
-		conn.send(b'Connection closed') #send the closing notice to client
-		print("exit code detected.closing server")
-		break
-	else:
-		conn.send(input.encode())
 
-conn.close	#close the connection
+print ("\nExiting Server")
